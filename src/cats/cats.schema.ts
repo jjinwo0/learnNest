@@ -1,6 +1,7 @@
-import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { Document, SchemaOptions } from 'mongoose';
 
 const options: SchemaOptions = {
   timestamps: true, //DB에서 Create될 때 timestamp 기록
@@ -50,18 +51,25 @@ export class Cat extends Document {
     description: 'url',
     required: true,
   })
-  @Prop()
+  @Prop({
+    default:
+      'https://github.com/amamov/NestJS-solid-restapi-boilerplate/raw/main/docs/images/1.jpeg',
+  })
   @IsString()
   imgUrl: string;
 
-  readonly readOnlyData: { id: string; email: string; name: string };
+  readonly readOnlyData: {
+    id: string;
+    email: string;
+    name: string;
+  };
 }
 
 export const CatSchema = SchemaFactory.createForClass(Cat);
 
 CatSchema.virtual('readOnlyData').get(function (this: Cat) {
   return {
-    id: this.body.id,
+    id: this.id,
     email: this.email,
     name: this.name,
   };
